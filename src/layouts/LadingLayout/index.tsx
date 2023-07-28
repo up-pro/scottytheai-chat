@@ -20,7 +20,7 @@ export default function LandingLayout() {
   return (
     <Stack sx={{ minHeight: '100vh' }} bgcolor={theme.palette.background.default}>
       {isMobile ? <MBHeader /> : <DPHeader />}
-      <Box flexGrow={1} py={{ xs: 4, md: 4 }}>
+      <Box flexGrow={1}>
         {/* <Container>
           <Stack direction="row" mb={1} justifyContent="start">
             <Stack direction="row">

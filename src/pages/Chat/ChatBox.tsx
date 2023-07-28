@@ -32,9 +32,9 @@ export default function ChatBox() {
   }, [chats])
 
   return (
-    <>
+    <Stack sx={{ height: '100%', bgcolor: grey[900] }}>
       {/* Chatbox */}
-      <Stack flexGrow={1} spacing={2} px={3} sx={{ overflowY: 'auto', height: '100px' }} ref={chatBoxRef}>
+      <Stack flexGrow={1} spacing={2} px={3} pt={3} sx={{ overflowY: 'auto', height: '100px' }} ref={chatBoxRef}>
         {chats.map(chat => (
           <Stack direction="row" spacing={1} key={chat.id}>
             {chat.sender === 'gpt' ? (
@@ -56,11 +56,11 @@ export default function ChatBox() {
       </Stack>
 
       {/* Input */}
-      <Stack spacing={2}>
+      <Stack spacing={2} pb={3}>
         <Stack direction="row" justifyContent="center">
           <Button sx={{ bgcolor: grey[800], borderRadius: 9999, px: 4 }}>Refetch</Button>
         </Stack>
-        <Box sx={{ px: 3 }} component="form" onSubmit={handleSubmit}>
+        <Box px={3} component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item md={10}>
               <TextField
@@ -80,6 +80,6 @@ export default function ChatBox() {
           </Grid>
         </Box>
       </Stack>
-    </>
+    </Stack>
   )
 }

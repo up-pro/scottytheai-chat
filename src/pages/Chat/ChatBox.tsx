@@ -32,7 +32,7 @@ export default function ChatBox() {
   }, [chats])
 
   return (
-    <Stack sx={{ height: '100%', bgcolor: grey[900] }}>
+    <Stack flexGrow={1} sx={{ height: '100%', bgcolor: grey[900] }}>
       {/* Chatbox */}
       <Stack flexGrow={1} spacing={2} px={3} pt={3} sx={{ overflowY: 'auto', height: '100px' }} ref={chatBoxRef}>
         {chats.map(chat => (
@@ -60,9 +60,9 @@ export default function ChatBox() {
         <Stack direction="row" justifyContent="center">
           <Button sx={{ bgcolor: grey[800], borderRadius: 9999, px: 4 }}>Refetch</Button>
         </Stack>
-        <Box px={3} component="form" onSubmit={handleSubmit}>
+        <Box px={{ xs: 2, md: 3 }} component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            <Grid item md={10}>
+            <Grid item xs={9} md={10}>
               <TextField
                 fullWidth
                 size="small"
@@ -70,7 +70,7 @@ export default function ChatBox() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setQuestion(e.target.value)}
               />
             </Grid>
-            <Grid item md={2}>
+            <Grid item xs={3} md={2}>
               <Button
                 variant="contained"
                 fullWidth

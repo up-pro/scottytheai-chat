@@ -1,5 +1,6 @@
+import { Link } from "react-router-dom";
 import { Add, Comment, Telegram, Twitter } from "@mui/icons-material";
-import { Box, Button, Grid, Link, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Grid, Stack, Typography, useTheme, Link as MuiLink } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { useAccount } from "wagmi";
 import ChatBox from "./ChatBox";
@@ -9,7 +10,27 @@ export default function Chat() {
   const { address } = useAccount()
 
   return (
-    <Box my={4} mx={4}>
+    <Box my={4} mx={4} display={{ xs: 'none', lg: 'block' }}>
+      <Grid container spacing={2}>
+        <Grid item md={3}></Grid>
+        <Grid item md={9}>
+          <Stack direction="row" mb={1} justifyContent="start">
+            <Stack direction="row">
+              <Stack height={40} px={2} justifyContent="center" bgcolor={theme.palette.primary.main}>
+                <Button component={Link} to="/">Chat</Button>
+              </Stack>
+              <Box
+                width={0}
+                height={0}
+                sx={{
+                  borderBottom: `40px solid ${theme.palette.primary.main}`,
+                  borderRight: '20px solid transparent'
+                }}
+              />
+            </Stack>
+          </Stack>
+        </Grid>
+      </Grid>
       <Grid container spacing={2}>
         {/* Left sidebar */}
         <Grid item md={3}>
@@ -68,7 +89,7 @@ export default function Chat() {
                       variant="contained"
                       sx={{ bgcolor: grey[900], width: '100%' }}
                       startIcon={<Twitter sx={{ color: theme.palette.primary.main }} />}
-                      component={Link}
+                      component={MuiLink}
                       href="#"
                       target="_blank"
                     >Twitter</Button>
@@ -78,7 +99,7 @@ export default function Chat() {
                       variant="contained"
                       sx={{ bgcolor: grey[900], width: '100%' }}
                       startIcon={<Telegram sx={{ color: theme.palette.primary.main }} />}
-                      component={Link}
+                      component={MuiLink}
                       href="#"
                       target="_blank"
                     >Telegram</Button>
@@ -88,7 +109,7 @@ export default function Chat() {
                       variant="contained"
                       sx={{ bgcolor: grey[900], width: '100%' }}
                       startIcon={<Box component="img" src="/assets/images/scotty.png" />}
-                      component={Link}
+                      component={MuiLink}
                       href="#"
                       target="_blank"
                     >Scotty AI</Button>
@@ -98,7 +119,7 @@ export default function Chat() {
                       variant="contained"
                       sx={{ bgcolor: grey[900], width: '100%' }}
                       startIcon={<Box component="img" src="/assets/images/uniswap.png" />}
-                      component={Link}
+                      component={MuiLink}
                       href="#"
                       target="_blank"
                     >Uniswap</Button>

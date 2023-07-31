@@ -147,7 +147,7 @@ export default function Chat() {
                       startIcon={<Add />}
                     >New Chat</Button>
 
-                    <Stack spacing={2} position="relative" flexGrow={1} height="100px" overflow="auto">
+                    <Stack spacing={2} position="relative" flexGrow={1} height="100px" sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
                       <Stack spacing={1}>
                         <Typography component="h5" color={grey[500]}>Today</Typography>
                         <Stack direction="row" spacing={1} alignItems="center">

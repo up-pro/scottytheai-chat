@@ -3,6 +3,8 @@ import { Button, Box, Grid, Stack, TextField, Avatar, Typography, CircularProgre
 import { grey } from "@mui/material/colors";
 import { OpenAIApi, Configuration, ChatCompletionRequestMessage } from 'openai';
 import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
+import api from '../../utils/api';
 
 //  ---------------------------------------------------------------------------------------------------
 
@@ -14,43 +16,55 @@ const openai = new OpenAIApi(configuration)
 //  ---------------------------------------------------------------------------------------------------
 
 export default function ChatBox() {
+  const { address } = useAccount()
+
   const chatBoxRef = useRef<HTMLDivElement | null>(null)
 
   const [question, setQuestion] = useState<string>('')
-  const [chats, setChats] = useState<Array<ChatCompletionRequestMessage>>([])
+  const [messages, setMessages] = useState<Array<ChatCompletionRequestMessage>>([])
   const [gptIsLoading, setGptIsLoading] = useState<boolean>(false)
 
   //  Send request to ChatGPT
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    try {
+      e.preventDefault()
 
-    const _chats = [...chats];
-    _chats.push({
-      role: 'user',
-      content: question
-    })
-
-    setChats(_chats)
-
-    setGptIsLoading(true)
-
-    openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: _chats,
-    }).then(res => {
-      if (res.data.choices[0].message) {
-        _chats.push(res.data.choices[0].message)
-        setChats(_chats)
-      }
-      setQuestion('')
-      setGptIsLoading(false)
-    })
-      .catch(error => {
-        console.log('>>>>>>>>> error => ', error)
-        setQuestion('')
-        setGptIsLoading(false)
-        toast.error('Chat engine occured error. Try again.')
+      const _messages = [...messages];
+      _messages.push({
+        role: 'user',
+        content: question
       })
+
+      setMessages(_messages)
+      setQuestion('')
+      setGptIsLoading(true)
+
+      //  Create chat history if user's wallet is connected and this is the first message
+      if (_messages.length === 1 && !!(address)) {
+        console.log('>>>>>>>>> sent request to the backend => ')
+        await api.post('/create-history', {
+          title: _messages[0].content,
+          creator_wallet_address: address
+        })
+      }
+
+      const chatCompletion = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: _messages,
+      })
+
+      if (chatCompletion.data.choices[0].message) {
+        _messages.push(chatCompletion.data.choices[0].message)
+        setMessages(_messages)
+      }
+      setGptIsLoading(false)
+
+    } catch (error) {
+      console.log('>>>>>>>>>>> error of handleSubmit => ', error)
+      setGptIsLoading(false)
+      toast.error('Chat engine occured error. Try again.')
+    }
+
   }
 
   //  Move scroll to the down automatically
@@ -59,15 +73,15 @@ export default function ChatBox() {
     if (lastChildElement) {
       lastChildElement?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [chats])
+  }, [messages])
 
   return (
     <Stack flexGrow={1} sx={{ height: '100%', bgcolor: grey[900] }}>
       {/* Chatbox */}
       <Stack flexGrow={1} spacing={2} px={3} pt={3} sx={{ overflowY: 'auto', height: '100px' }} ref={chatBoxRef}>
-        {chats.map((chat, index) => (
+        {messages.map((message, index) => (
           <Stack direction="row" spacing={1} key={index}>
-            {chat.role !== 'user' ? (
+            {message.role !== 'user' ? (
               <Avatar
                 src="/assets/images/gpt.png"
                 alt="GPT"
@@ -79,7 +93,7 @@ export default function ChatBox() {
               />
             )}
             <Typography component="p" color={grey[100]} fontSize={18}>
-              {chat.content}
+              {message.content}
             </Typography>
           </Stack>
         ))}

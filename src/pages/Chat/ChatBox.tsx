@@ -1,8 +1,8 @@
 import { FormEvent, ChangeEvent, useState, useRef, useEffect } from 'react';
-import { Button, Box, Grid, Stack, TextField, Avatar, Typography } from "@mui/material";
+import { Button, Box, Grid, Stack, TextField, Avatar, Typography, CircularProgress } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import { OpenAIApi, Configuration } from 'openai';
-import { IChat } from '../../utils/interfaces';
+import { OpenAIApi, Configuration, ChatCompletionRequestMessage } from 'openai';
+import { toast } from 'react-toastify';
 
 //  ---------------------------------------------------------------------------------------------------
 
@@ -17,47 +17,43 @@ export default function ChatBox() {
   const chatBoxRef = useRef<HTMLDivElement | null>(null)
 
   const [question, setQuestion] = useState<string>('')
-  const [chats, setChats] = useState<Array<IChat>>([])
-  const [gptIsLoading] = useState<boolean>(false)
+  const [chats, setChats] = useState<Array<ChatCompletionRequestMessage>>([])
+  const [gptIsLoading, setGptIsLoading] = useState<boolean>(false)
 
+  //  Send request to ChatGPT
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    const _chats = [...chats];
+    _chats.push({
+      role: 'user',
+      content: question
+    })
+
+    setChats(_chats)
+
+    setGptIsLoading(true)
+
     openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          "role": "system",
-          "content": "You are a helpful assistant."
-        },
-        {
-          "role": "user",
-          "content": "Hello!"
-        }
-      ]
-    }).then(res => console.log(res))
-      .catch(error => console.log('>>>>>>>>> error => ', error))
-
-    // apiOfOpenAi.post('', {
-    //   model: 'gpt-3.5-turbo',
-    //   messages: [{
-    //     role: 'system',
-    //     content: question
-    //   }]
-    // }).then(res => console.log(res))
-    //   .catch(error => console.log('>>>>>>>>> error => ', error))
-
-    const newChat: IChat = {
-      id: chats.length,
-      sender: 'user',
-      message: question
-    }
-
-    if (!gptIsLoading) {
-      setChats([...chats, newChat])
-    }
+      messages: _chats,
+    }).then(res => {
+      if (res.data.choices[0].message) {
+        _chats.push(res.data.choices[0].message)
+        setChats(_chats)
+      }
+      setQuestion('')
+      setGptIsLoading(false)
+    })
+      .catch(error => {
+        console.log('>>>>>>>>> error => ', error)
+        setQuestion('')
+        setGptIsLoading(false)
+        toast.error('Chat engine occured error. Try again.')
+      })
   }
 
+  //  Move scroll to the down automatically
   useEffect(() => {
     const lastChildElement = chatBoxRef.current?.lastElementChild
     if (lastChildElement) {
@@ -69,9 +65,9 @@ export default function ChatBox() {
     <Stack flexGrow={1} sx={{ height: '100%', bgcolor: grey[900] }}>
       {/* Chatbox */}
       <Stack flexGrow={1} spacing={2} px={3} pt={3} sx={{ overflowY: 'auto', height: '100px' }} ref={chatBoxRef}>
-        {chats.map(chat => (
-          <Stack direction="row" spacing={1} key={chat.id}>
-            {chat.sender === 'gpt' ? (
+        {chats.map((chat, index) => (
+          <Stack direction="row" spacing={1} key={index}>
+            {chat.role !== 'user' ? (
               <Avatar
                 src="/assets/images/gpt.png"
                 alt="GPT"
@@ -83,10 +79,19 @@ export default function ChatBox() {
               />
             )}
             <Typography component="p" color={grey[100]} fontSize={18}>
-              {chat.message}
+              {chat.content}
             </Typography>
           </Stack>
         ))}
+        {gptIsLoading && (
+          <Stack direction="row" spacing={1}>
+            <Avatar
+              src="/assets/images/gpt.png"
+              alt="GPT"
+            />
+            <CircularProgress />
+          </Stack>
+        )}
       </Stack>
 
       {/* Input */}

@@ -9,7 +9,6 @@ export interface ISocialLink {
 }
 
 export interface IChat {
-  id: number;
-  sender: TMember;
-  message: string;
+  role: TMember;
+  content: string;
 }

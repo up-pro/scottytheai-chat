@@ -1,13 +1,42 @@
+import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Add, Comment, Telegram, Twitter } from "@mui/icons-material";
 import { Box, Button, Grid, Stack, Typography, useTheme, Link as MuiLink } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { useAccount } from "wagmi";
+import { toast } from 'react-toastify';
+import * as _ from 'lodash';
 import ChatBox from "./ChatBox";
+import api from "../../utils/api";
+import { IChatHistoriesByDates } from "../../utils/interfaces";
 
 export default function Chat() {
   const theme = useTheme()
   const { address } = useAccount()
+
+  const [chatHistoriesByDates, setChatHistoriesByDates] = useState<IChatHistoriesByDates>({})
+  const [dates, setDates] = useState<Array<string>>([])
+
+  //  Get histories of the current user
+  const getChatHistories = () => {
+    api.get(`/get-histories/${address}`)
+      .then(async res => {
+        const groupByResult = _.groupBy(res.data, _.iteratee('updated_date'))
+        const _dates = Object.keys(groupByResult)
+        setDates(_dates)
+        setChatHistoriesByDates(groupByResult)
+      })
+      .catch(error => {
+        console.log('>>>>>>>> error of getChatHistories => ', error)
+        toast.error('Getting chat histories have been failed.')
+      })
+  }
+
+  useEffect(() => {
+    if (address) {
+      getChatHistories()
+    }
+  }, [address])
 
   return (
     <>
@@ -148,114 +177,20 @@ export default function Chat() {
                     >New Chat</Button>
 
                     <Stack spacing={2} position="relative" flexGrow={1} height="100px" sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
+                      {dates.map(date => (
+                        <Stack spacing={1} key={date}>
+                          <Typography component="h5" color={grey[500]}>{date}</Typography>
+                          {chatHistoriesByDates[date].map(chatHistoryByDate => (
+                            <Stack direction="row" spacing={1} alignItems="center" key={chatHistoryByDate.id}>
+                              <Comment sx={{ color: grey[100], fontSize: 18 }} />
+                              <Typography component="p" color={grey[100]} fontSize={14}>
+                                {chatHistoryByDate.title}
+                              </Typography>
+                            </Stack>
+                          ))}
+
                         </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      <Stack spacing={1}>
-                        <Typography component="h5" color={grey[500]}>Today</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                          <Typography component="p" color={grey[100]} fontSize={14}>
-                            Hello.Hello.Hello.Hello.Hello.Hello.
-                          </Typography>
-                        </Stack>
-                      </Stack>
+                      ))}
 
                       <Box
                         position="absolute"

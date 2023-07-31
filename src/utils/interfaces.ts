@@ -1,5 +1,4 @@
 import { ElementType } from "react";
-import { TMember } from "./types";
 
 export interface ISocialLink {
   id: number;
@@ -8,7 +7,14 @@ export interface ISocialLink {
   label: string;
 }
 
-export interface IChat {
-  role: TMember;
-  content: string;
+export interface IChatHistory {
+  id: number;
+  title: string;
+  creator_wallet_address: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IChatHistoriesByDates {
+  [key: string]: Array<IChatHistory>;
 }

@@ -27,44 +27,43 @@ export default function ChatBox() {
   //  Send request to ChatGPT
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     try {
-      e.preventDefault()
+      if (question) {
+        e.preventDefault()
 
-      const _messages = [...messages];
-      _messages.push({
-        role: 'user',
-        content: question
-      })
-
-      setMessages(_messages)
-      setQuestion('')
-      setGptIsLoading(true)
-
-      //  Create chat history if user's wallet is connected and this is the first message
-      if (_messages.length === 1 && !!(address)) {
-        console.log('>>>>>>>>> sent request to the backend => ')
-        await api.post('/create-history', {
-          title: _messages[0].content,
-          creator_wallet_address: address
+        const _messages = [...messages];
+        _messages.push({
+          role: 'user',
+          content: question
         })
-      }
 
-      const chatCompletion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: _messages,
-      })
-
-      if (chatCompletion.data.choices[0].message) {
-        _messages.push(chatCompletion.data.choices[0].message)
         setMessages(_messages)
-      }
-      setGptIsLoading(false)
+        setQuestion('')
+        setGptIsLoading(true)
 
+        //  Create chat history if user's wallet is connected and this is the first message
+        if (_messages.length === 1 && !!(address)) {
+          await api.post('/create-history', {
+            title: _messages[0].content,
+            creatorWalletAddress: address
+          })
+        }
+
+        const chatCompletion = await openai.createChatCompletion({
+          model: 'gpt-3.5-turbo',
+          messages: _messages,
+        })
+
+        if (chatCompletion.data.choices[0].message) {
+          _messages.push(chatCompletion.data.choices[0].message)
+          setMessages(_messages)
+        }
+        setGptIsLoading(false)
+      }
     } catch (error) {
       console.log('>>>>>>>>>>> error of handleSubmit => ', error)
       setGptIsLoading(false)
       toast.error('Chat engine occured error. Try again.')
     }
-
   }
 
   //  Move scroll to the down automatically

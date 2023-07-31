@@ -1,7 +1,17 @@
 import { FormEvent, ChangeEvent, useState, useRef, useEffect } from 'react';
 import { Button, Box, Grid, Stack, TextField, Avatar, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
+import { OpenAIApi, Configuration } from 'openai';
 import { IChat } from '../../utils/interfaces';
+
+//  ---------------------------------------------------------------------------------------------------
+
+const configuration = new Configuration({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY
+})
+const openai = new OpenAIApi(configuration)
+
+//  ---------------------------------------------------------------------------------------------------
 
 export default function ChatBox() {
   const chatBoxRef = useRef<HTMLDivElement | null>(null)
@@ -10,8 +20,32 @@ export default function ChatBox() {
   const [chats, setChats] = useState<Array<IChat>>([])
   const [gptIsLoading] = useState<boolean>(false)
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          "role": "system",
+          "content": "You are a helpful assistant."
+        },
+        {
+          "role": "user",
+          "content": "Hello!"
+        }
+      ]
+    }).then(res => console.log(res))
+      .catch(error => console.log('>>>>>>>>> error => ', error))
+
+    // apiOfOpenAi.post('', {
+    //   model: 'gpt-3.5-turbo',
+    //   messages: [{
+    //     role: 'system',
+    //     content: question
+    //   }]
+    // }).then(res => console.log(res))
+    //   .catch(error => console.log('>>>>>>>>> error => ', error))
 
     const newChat: IChat = {
       id: chats.length,

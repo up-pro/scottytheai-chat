@@ -11,6 +11,7 @@ export default function Chat() {
 
   return (
     <>
+      {/* Desktop */}
       <Box my={4} mx={4} display={{ xs: 'none', lg: 'block' }}>
         <Grid container spacing={2}>
           <Grid item md={3}></Grid>
@@ -45,24 +46,24 @@ export default function Chat() {
                 <Stack position="absolute" width="100%" height="100%" justifyContent="center" alignItems="center">
                   <Stack spacing={2}>
                     <Stack direction="row" justifyContent="center" spacing={2}>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
                     </Stack>
                     <Stack direction="row" justifyContent="center" spacing={2}>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
                     </Stack>
                     <Stack direction="row" justifyContent="center" spacing={2}>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
                     </Stack>
                     <Stack direction="row" justifyContent="center" spacing={2}>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
-                      <Typography component="span" fontSize={14} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
+                      <Typography component="span" fontSize={18} color={grey[100]}>11100100</Typography>
                     </Stack>
                   </Stack>
                 </Stack>
@@ -275,6 +276,7 @@ export default function Chat() {
         </Grid>
       </Box>
 
+      {/* Mobile */}
       <Stack flexGrow={1} py={2} px={1} display={{ xs: 'flex', lg: 'none' }} height="100%" spacing={1}>
         <Stack direction="row">
           <Stack height={40} px={2} justifyContent="center" bgcolor={theme.palette.primary.main}>

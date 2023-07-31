@@ -17,6 +17,8 @@
     "@mui/material": "^5.14.1",
     "@web3modal/ethereum": "^2.7.0",
     "@web3modal/react": "^2.7.0",
+    "axios": "^1.4.0",
+    "openai": "^3.3.0",
     "react": "^18.2.0",
     "react-custom-scroll": "^5.0.0",
     "react-dom": "^18.2.0",

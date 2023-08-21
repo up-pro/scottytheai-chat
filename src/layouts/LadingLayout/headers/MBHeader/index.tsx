@@ -1,18 +1,9 @@
-import { useState } from "react";
 import { Menu } from "@mui/icons-material";
 import { AppBar, Box, Container, IconButton, Toolbar } from "@mui/material";
-import MenuDialog from "./MenuDialog";
+import useMobileMenu from "../../../../hooks/useMobileMenu";
 
 export default function MBHeader() {
-  const [menuOpened, setMenuOpened] = useState<boolean>(false)
-
-  const openMenu = () => {
-    setMenuOpened(true)
-  }
-
-  const closeMenu = () => {
-    setMenuOpened(false)
-  }
+  const { openMenuAct } = useMobileMenu()
 
   return (
     <>
@@ -28,17 +19,12 @@ export default function MBHeader() {
           </Container>
           <IconButton
             sx={{ position: 'absolute', right: '3%' }}
-            onClick={openMenu}
+            onClick={() => openMenuAct()}
           >
             <Menu />
           </IconButton>
         </Toolbar>
       </AppBar>
-
-      <MenuDialog
-        open={menuOpened}
-        onClose={closeMenu}
-      />
     </>
   )
 }

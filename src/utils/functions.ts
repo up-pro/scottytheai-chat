@@ -1,4 +1,4 @@
-import { IChatHistory } from "./interfaces";
+import { IChatHistoriesByDates, IChatHistory } from "./interfaces";
 
 export const isChatHistory = (obj: unknown): obj is IChatHistory => {
   if (typeof obj === "object" && obj !== null) {
@@ -16,4 +16,22 @@ export const isChatHistory = (obj: unknown): obj is IChatHistory => {
   } else {
     return false;
   }
+};
+
+export const isChatHistoriesByDates = (
+  obj: unknown
+): obj is IChatHistoriesByDates => {
+  if (typeof obj === "object" && obj !== null) {
+    const chatHistoriesObj = obj as Partial<IChatHistoriesByDates>;
+
+    for (const key in chatHistoriesObj) {
+      const historyArray = chatHistoriesObj[key];
+
+      if (!Array.isArray(historyArray) || !historyArray.every(isChatHistory)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
 };

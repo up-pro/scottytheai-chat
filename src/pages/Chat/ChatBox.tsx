@@ -34,12 +34,14 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
 
   const [question, setQuestion] = useState<string>('')
   const [gptIsLoading, setGptIsLoading] = useState<boolean>(false)
+  const [refetchable, setRefetchable] = useState<boolean>(false)
 
   //  Send request to ChatGPT
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     try {
       if (question) {
         e.preventDefault()
+        setRefetchable(false)
 
         const _messages = [...messages];
         _messages.push({
@@ -83,6 +85,49 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
       }
     } catch (error) {
       console.log('>>>>>>>>>>> error of handleSubmit => ', error)
+      setRefetchable(true)
+      setGptIsLoading(false)
+      toast.error('Chat engine occured error. Try again.')
+    }
+  }
+
+  const refetch = async () => {
+    try {
+      setGptIsLoading(true)
+      setRefetchable(false)
+      const _messages = [...messages]
+      //  Create chat history if user's wallet is connected and this is the first message
+      if (_messages.length === 1 && !!(address)) {
+        const { chatHistories, createdChatHistory } = (await api.post('/create-history', {
+          title: _messages[0].content,
+          creatorWalletAddress: address,
+          messages: _messages
+        })).data
+        setChatHistories(chatHistories)
+        setCurrentChatHistory(createdChatHistory)
+      }
+
+      const chatCompletion = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: _messages,
+      })
+
+      if (chatCompletion.data.choices[0].message) {
+        _messages.push(chatCompletion.data.choices[0].message)
+        await api.post('/save-messages', {
+          chatHistoryId: currentChatHistory?.id,
+          messages: _messages
+        })
+        const chatHistory = chatHistories.find(_chatHistory => _chatHistory.id === currentChatHistory?.id)
+        if (chatHistory) {
+          chatHistory.messages = JSON.stringify(_messages)
+        }
+        setMessages(_messages)
+      }
+      setGptIsLoading(false)
+    } catch (error) {
+      console.log('>>>>>>>>>>> error of refetch => ', error)
+      setRefetchable(true)
       setGptIsLoading(false)
       toast.error('Chat engine occured error. Try again.')
     }
@@ -132,7 +177,11 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
       {/* Input */}
       <Stack spacing={2} pb={3}>
         <Stack direction="row" justifyContent="center">
-          <Button sx={{ bgcolor: grey[800], borderRadius: 9999, px: 4 }}>Refetch</Button>
+          <Button
+            sx={{ bgcolor: grey[800], borderRadius: 9999, px: 4 }}
+            onClick={refetch}
+            disabled={!refetchable}
+          >Refetch</Button>
         </Stack>
         <Box px={{ xs: 2, md: 3 }} component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>

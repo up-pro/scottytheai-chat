@@ -9,8 +9,9 @@ import * as _ from 'lodash';
 import { ChatCompletionRequestMessage } from 'openai';
 import ChatBox from "./ChatBox";
 import api from "../../utils/api";
-import { IChatHistory } from "../../utils/interfaces";
-import { isChatHistory } from '../../utils/functions';
+import { IChatHistoriesByDates, IChatHistory } from "../../utils/interfaces";
+import { isChatHistoriesByDates } from '../../utils/functions';
+import MenuDialog from './MenuDialog';
 
 //  -----------------------------------------------------------------------------------------------------------
 
@@ -29,9 +30,13 @@ export default function Chat() {
   const [title, setTitle] = useState<string>('')
   const [deleteDialogOpened, setDeleteDialogOpened] = useState<boolean>(false)
 
-  const chatHistoriesByDates = useMemo(() => {
+  const chatHistoriesByDates = useMemo<IChatHistoriesByDates | null>(() => {
     const groupByResult = _.groupBy(chatHistories, _.iteratee('updated_date'));
-    return groupByResult
+    if (isChatHistoriesByDates(groupByResult)) {
+      return groupByResult
+    } else {
+      return null
+    }
   }, [chatHistories])
 
   const dates = useMemo<Array<string>>(() => {
@@ -80,6 +85,10 @@ export default function Chat() {
       })
   }
 
+  const createNewChat = () => {
+    setCurrentChatHistory(null)
+  }
+
   useEffect(() => {
     if (address) {
       getChatHistories()
@@ -89,6 +98,8 @@ export default function Chat() {
   useEffect(() => {
     if (currentChatHistory) {
       setMessages(JSON.parse(currentChatHistory.messages))
+    } else {
+      setMessages([])
     }
   }, [currentChatHistory])
 
@@ -237,94 +248,89 @@ export default function Chat() {
                       variant="contained"
                       sx={{ bgcolor: grey[900] }}
                       startIcon={<Add />}
+                      onClick={createNewChat}
                     >New Chat</Button>
 
                     <Stack spacing={2} position="relative" flexGrow={1} height="100px" sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
                       {dates.map(date => (
                         <Stack spacing={1} key={date}>
                           <Typography component="h5" color={grey[500]}>{date}</Typography>
-                          {chatHistoriesByDates[date].map((chatHistoryByDate, index) => (
+                          {chatHistoriesByDates && chatHistoriesByDates[date].map((chatHistoryByDate, index) => (
                             <Stack
                               direction="row"
                               alignItems="center"
                               justifyContent="space-between"
                               key={index}
                             >
-                              {isChatHistory(chatHistoryByDate) ? (
+                              {currentChatHistory?.id === chatHistoryByDate.id ? (
                                 <>
-                                  {currentChatHistory?.id === chatHistoryByDate.id ? (
-                                    <>
-                                      <Stack
-                                        direction="row"
-                                        spacing={1}
-                                        sx={{ cursor: 'pointer' }}
-                                      >
-                                        <Comment sx={{ color: grey[100], fontSize: 18, mt: 0.7 }} />
-                                        {titleEditable ? (
-                                          <TextField
-                                            size="small"
-                                            InputProps={{
-                                              endAdornment: <Stack direction="row" alignItems="center">
-                                                <Check
-                                                  sx={{ fontSize: 18, cursor: 'pointer' }}
-                                                  onClick={() => updateTitle()}
-                                                />
-                                                <Close
-                                                  sx={{ fontSize: 18, cursor: 'pointer' }}
-                                                  onClick={() => handleTitleEditable(false, '')}
-                                                />
-                                              </Stack>
-                                            }}
-                                            inputProps={{
-                                              style: {
-                                                fontSize: 18
-                                              }
-                                            }}
-                                            value={title}
-                                            onChange={handleTitle}
-                                          />
-                                        ) : (
-                                          <Typography component="p" color={grey[100]} fontSize={18}>
-                                            {chatHistoryByDate.title}
-                                          </Typography>
-                                        )}
-                                      </Stack>
-
-                                      <Stack
-                                        direction="row"
-                                        alignItems="center"
-                                      >
-                                        <IconButton onClick={() => handleTitleEditable(true, chatHistoryByDate.title)}>
-                                          <Edit sx={{ fontSize: 18 }} />
-                                        </IconButton>
-                                        <IconButton onClick={() => setDeleteDialogOpened(true)}>
-                                          <Delete sx={{ fontSize: 18 }} />
-                                        </IconButton>
-                                      </Stack>
-                                    </>
-                                  ) : (
-                                    <Stack
-                                      direction="row"
-                                      spacing={1}
-                                      sx={{ cursor: 'pointer' }}
-                                      onClick={() => setCurrentChatHistory(chatHistoryByDate)}
-                                    >
-                                      <Comment sx={{ color: grey[100], fontSize: 18, mt: 0.7 }} />
+                                  <Stack
+                                    direction="row"
+                                    spacing={1}
+                                    sx={{ cursor: 'pointer' }}
+                                  >
+                                    <Comment sx={{ color: grey[100], fontSize: 18, mt: 0.7 }} />
+                                    {titleEditable ? (
+                                      <TextField
+                                        size="small"
+                                        InputProps={{
+                                          endAdornment: <Stack direction="row" alignItems="center">
+                                            <Check
+                                              sx={{ fontSize: 18, cursor: 'pointer' }}
+                                              onClick={() => updateTitle()}
+                                            />
+                                            <Close
+                                              sx={{ fontSize: 18, cursor: 'pointer' }}
+                                              onClick={() => handleTitleEditable(false, '')}
+                                            />
+                                          </Stack>
+                                        }}
+                                        inputProps={{
+                                          style: {
+                                            fontSize: 18
+                                          }
+                                        }}
+                                        value={title}
+                                        onChange={handleTitle}
+                                      />
+                                    ) : (
                                       <Typography component="p" color={grey[100]} fontSize={18}>
                                         {chatHistoryByDate.title}
                                       </Typography>
-                                    </Stack>
-                                  )}
+                                    )}
+                                  </Stack>
+
+                                  <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                  >
+                                    <IconButton onClick={() => handleTitleEditable(true, chatHistoryByDate.title)}>
+                                      <Edit sx={{ fontSize: 18 }} />
+                                    </IconButton>
+                                    <IconButton onClick={() => setDeleteDialogOpened(true)}>
+                                      <Delete sx={{ fontSize: 18 }} />
+                                    </IconButton>
+                                  </Stack>
                                 </>
                               ) : (
-                                <></>
+                                <Stack
+                                  direction="row"
+                                  spacing={1}
+                                  sx={{ cursor: 'pointer' }}
+                                  onClick={() => setCurrentChatHistory(chatHistoryByDate)}
+                                >
+                                  <Comment sx={{ color: grey[100], fontSize: 18, mt: 0.7 }} />
+                                  <Typography component="p" color={grey[100]} fontSize={18}>
+                                    {chatHistoryByDate.title}
+                                  </Typography>
+                                </Stack>
                               )}
                             </Stack>
                           ))}
                         </Stack>
                       ))}
 
-                      <Box
+                      {/* <Box
                         position="absolute"
                         top={0}
                         right={0}
@@ -333,7 +339,7 @@ export default function Chat() {
                         sx={{
                           backgroundImage: `linear-gradient(to right, rgba(17, 17, 17, 0.5), rgba(17, 17, 17, 1))`
                         }}
-                      />
+                      /> */}
                     </Stack>
                   </Stack>
                 </Grid>
@@ -376,8 +382,21 @@ export default function Chat() {
         opened={deleteDialogOpened}
         setOpened={setDeleteDialogOpened}
         currentChatHistory={currentChatHistory}
+        setCurrentChatHistory={setCurrentChatHistory}
         chatHistories={chatHistories}
         setChatHistories={setChatHistories}
+      />
+      <MenuDialog
+        dates={dates}
+        currentChatHistory={currentChatHistory}
+        setCurrentChatHistory={setCurrentChatHistory}
+        chatHistoriesByDates={chatHistoriesByDates}
+        titleEditable={titleEditable}
+        setTitleEditable={setTitleEditable}
+        setDeleteDialogOpened={setDeleteDialogOpened}
+        updateTitle={updateTitle}
+        setTitle={setTitle}
+        title={title}
       />
     </>
   )

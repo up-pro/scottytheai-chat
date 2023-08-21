@@ -9,13 +9,14 @@ interface IProps {
   opened: boolean;
   setOpened: (_opened: boolean) => void;
   currentChatHistory: IChatHistory | null;
+  setCurrentChatHistory: (chatHistory: IChatHistory | null) => void;
   chatHistories: Array<IChatHistory>;
   setChatHistories: (_chatHistories: Array<IChatHistory>) => void;
 }
 
 //  -----------------------------------------------------------------------------------------
 
-export default function DeleteDialog({ opened, setOpened, currentChatHistory, chatHistories, setChatHistories }: IProps) {
+export default function DeleteDialog({ opened, setOpened, currentChatHistory, setCurrentChatHistory, chatHistories, setChatHistories }: IProps) {
   const { openLoadingAct, closeLoadingAct } = useLoading()
 
   const closeDialog = () => {
@@ -30,6 +31,7 @@ export default function DeleteDialog({ opened, setOpened, currentChatHistory, ch
         const indexOfDeleteChatHistory = _chatHistories.findIndex(_chatHistory => _chatHistory.id === currentChatHistory?.id)
         _chatHistories.splice(indexOfDeleteChatHistory, 1)
         setChatHistories(_chatHistories)
+        setCurrentChatHistory(null)
         closeDialog()
         closeLoadingAct()
       })

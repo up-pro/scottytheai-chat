@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify"
 import LoadingForSuspense from "./components/LoadingForSuspense";
 import Routes from "./Routes"
 import { LoadingProvider } from "./contexts/LoadingContext"
+import { MobileMenuProvider } from "./contexts/MobileMenuContext"
 
 //  --------------------------------------------------------------------------------------
 
@@ -54,9 +55,11 @@ function App() {
       <WagmiConfig config={wagmiConfig}>
         <ThemeProvider theme={theme}>
           <LoadingProvider>
-            <BrowserRouter>
-              <Routes />
-            </BrowserRouter>
+            <MobileMenuProvider>
+              <BrowserRouter>
+                <Routes />
+              </BrowserRouter>
+            </MobileMenuProvider>
           </LoadingProvider>
         </ThemeProvider>
       </WagmiConfig>

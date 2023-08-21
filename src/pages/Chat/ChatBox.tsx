@@ -55,17 +55,6 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
           setQuestion('')
           setGptIsLoading(true)
 
-          //  Create chat history if user's wallet is connected and this is the first message
-          if (_messages.length === 1) {
-            const { chatHistories, createdChatHistory } = (await api.post('/create-history', {
-              title: _messages[0].content,
-              creatorWalletAddress: address,
-              messages: _messages
-            })).data
-            setChatHistories(chatHistories)
-            setCurrentChatHistory(createdChatHistory)
-          }
-
           const chatCompletion = await openai.createChatCompletion({
             model: 'gpt-3.5-turbo',
             messages: _messages,
@@ -73,13 +62,23 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
 
           if (chatCompletion.data.choices[0].message) {
             _messages.push(chatCompletion.data.choices[0].message)
-            await api.post('/save-messages', {
-              chatHistoryId: currentChatHistory?.id,
-              messages: _messages
-            })
-            const chatHistory = chatHistories.find(_chatHistory => _chatHistory.id === currentChatHistory?.id)
-            if (chatHistory) {
-              chatHistory.messages = JSON.stringify(_messages)
+            if (_messages.length <= 2) {
+              const { chatHistories, createdChatHistory } = (await api.post('/create-history', {
+                title: _messages[0].content,
+                creatorWalletAddress: address,
+                messages: _messages
+              })).data
+              setChatHistories(chatHistories)
+              setCurrentChatHistory(createdChatHistory)
+            } else {
+              await api.post('/save-messages', {
+                chatHistoryId: currentChatHistory?.id,
+                messages: _messages
+              })
+              const chatHistory = chatHistories.find(_chatHistory => _chatHistory.id === currentChatHistory?.id)
+              if (chatHistory) {
+                chatHistory.messages = JSON.stringify(_messages)
+              }
             }
             setMessages(_messages)
           }

@@ -10,9 +10,12 @@ export interface ISocialLink {
 export interface IChatHistory {
   id: number;
   title: string;
+  messages: string;
   creator_wallet_address: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
+  created_date: string;
+  updated_date: string;
 }
 
 export interface IChatHistoriesByDates {

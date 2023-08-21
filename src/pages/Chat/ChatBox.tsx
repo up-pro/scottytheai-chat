@@ -4,7 +4,9 @@ import { grey } from "@mui/material/colors";
 import { OpenAIApi, Configuration, ChatCompletionRequestMessage } from 'openai';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
+import * as _ from 'lodash';
 import api from '../../utils/api';
+import { IChatHistoriesByDates } from '../../utils/interfaces';
 
 //  ---------------------------------------------------------------------------------------------------
 
@@ -15,13 +17,24 @@ const openai = new OpenAIApi(configuration)
 
 //  ---------------------------------------------------------------------------------------------------
 
-export default function ChatBox() {
+interface IProps {
+  messages: Array<ChatCompletionRequestMessage>;
+  currentChatHistoryId: number;
+  chatHistoriesByDates: IChatHistoriesByDates;
+  setMessages: (_messages: Array<ChatCompletionRequestMessage>) => void;
+  setChatHistoriesByDates: (_chatHistoriesByDates: IChatHistoriesByDates) => void;
+  setDates: (_dates: Array<string>) => void;
+  setCurrentChatHistoryId: (id: number) => void;
+}
+
+//  ---------------------------------------------------------------------------------------------------
+
+export default function ChatBox({ messages, setMessages, chatHistoriesByDates, setChatHistoriesByDates, setDates, currentChatHistoryId, setCurrentChatHistoryId }: IProps) {
   const { address } = useAccount()
 
   const chatBoxRef = useRef<HTMLDivElement | null>(null)
 
   const [question, setQuestion] = useState<string>('')
-  const [messages, setMessages] = useState<Array<ChatCompletionRequestMessage>>([])
   const [gptIsLoading, setGptIsLoading] = useState<boolean>(false)
 
   //  Send request to ChatGPT
@@ -42,10 +55,18 @@ export default function ChatBox() {
 
         //  Create chat history if user's wallet is connected and this is the first message
         if (_messages.length === 1 && !!(address)) {
-          await api.post('/create-history', {
+          const { chatHistories, createdChatHistoryId } = (await api.post('/create-history', {
             title: _messages[0].content,
-            creatorWalletAddress: address
-          })
+            creatorWalletAddress: address,
+            messages: _messages
+          })).data
+          console.log('>>>>>>>>> createdChatHistoryId => ', createdChatHistoryId)
+
+          const groupByResult = _.groupBy(chatHistories, _.iteratee('updated_date'))
+          const _dates = Object.keys(groupByResult)
+          setDates(_dates)
+          setChatHistoriesByDates(groupByResult)
+          setCurrentChatHistoryId(createdChatHistoryId)
         }
 
         const chatCompletion = await openai.createChatCompletion({
@@ -55,6 +76,15 @@ export default function ChatBox() {
 
         if (chatCompletion.data.choices[0].message) {
           _messages.push(chatCompletion.data.choices[0].message)
+          await api.post('/save-messages', {
+            chatHistoryId: currentChatHistoryId,
+            messages: _messages
+          })
+          const chatHistories = _.flatMap(chatHistoriesByDates);
+          const chatHistory = chatHistories.find(_chatHistory => _chatHistory.id === currentChatHistoryId)
+          if (chatHistory) {
+            chatHistory.messages = JSON.stringify(_messages)
+          }
           setMessages(_messages)
         }
         setGptIsLoading(false)

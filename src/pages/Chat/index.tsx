@@ -6,9 +6,12 @@ import { grey } from "@mui/material/colors";
 import { useAccount } from "wagmi";
 import { toast } from 'react-toastify';
 import * as _ from 'lodash';
+import { ChatCompletionRequestMessage } from 'openai';
 import ChatBox from "./ChatBox";
 import api from "../../utils/api";
-import { IChatHistoriesByDates } from "../../utils/interfaces";
+import { IChatHistoriesByDates, IChatHistory } from "../../utils/interfaces";
+
+//  -----------------------------------------------------------------------------------------------------------
 
 export default function Chat() {
   const theme = useTheme()
@@ -16,11 +19,13 @@ export default function Chat() {
 
   const [chatHistoriesByDates, setChatHistoriesByDates] = useState<IChatHistoriesByDates>({})
   const [dates, setDates] = useState<Array<string>>([])
+  const [messages, setMessages] = useState<Array<ChatCompletionRequestMessage>>([])
+  const [currentChatHistoryId, setCurrentChatHistoryId] = useState<number>(0)
 
   //  Get histories of the current user
   const getChatHistories = () => {
     api.get(`/get-histories/${address}`)
-      .then(async res => {
+      .then(res => {
         const groupByResult = _.groupBy(res.data, _.iteratee('updated_date'))
         const _dates = Object.keys(groupByResult)
         setDates(_dates)
@@ -30,6 +35,11 @@ export default function Chat() {
         console.log('>>>>>>>> error of getChatHistories => ', error)
         toast.error('Getting chat histories have been failed.')
       })
+  }
+
+  const setCurrentChatHistory = (chatHistory: IChatHistory) => {
+    setMessages(JSON.parse(chatHistory.messages))
+    setCurrentChatHistoryId(chatHistory.id)
   }
 
   useEffect(() => {
@@ -164,10 +174,20 @@ export default function Chat() {
           <Grid item md={9}>
             <Box height="100%">
               <Grid container height="100%" columnSpacing={2}>
+                {/* Chatbox */}
                 <Grid item md={9}>
-                  <ChatBox />
+                  <ChatBox
+                    messages={messages}
+                    currentChatHistoryId={currentChatHistoryId}
+                    chatHistoriesByDates={chatHistoriesByDates}
+                    setMessages={setMessages}
+                    setChatHistoriesByDates={setChatHistoriesByDates}
+                    setCurrentChatHistoryId={setCurrentChatHistoryId}
+                    setDates={setDates}
+                  />
                 </Grid>
 
+                {/* Right sidebar */}
                 <Grid item md={3}>
                   <Stack spacing={2} height="100%">
                     <Button
@@ -181,14 +201,20 @@ export default function Chat() {
                         <Stack spacing={1} key={date}>
                           <Typography component="h5" color={grey[500]}>{date}</Typography>
                           {chatHistoriesByDates[date].map(chatHistoryByDate => (
-                            <Stack direction="row" spacing={1} alignItems="center" key={chatHistoryByDate.id}>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                              key={chatHistoryByDate.id}
+                              sx={{ cursor: 'pointer' }}
+                              onClick={() => setCurrentChatHistory(chatHistoryByDate)}
+                            >
                               <Comment sx={{ color: grey[100], fontSize: 18 }} />
-                              <Typography component="p" color={grey[100]} fontSize={14}>
+                              <Typography component="p" color={grey[100]} fontSize={18}>
                                 {chatHistoryByDate.title}
                               </Typography>
                             </Stack>
                           ))}
-
                         </Stack>
                       ))}
 
@@ -196,7 +222,7 @@ export default function Chat() {
                         position="absolute"
                         top={0}
                         right={0}
-                        height="100%"
+                        height="auto"
                         width="20%"
                         sx={{
                           backgroundImage: `linear-gradient(to right, rgba(17, 17, 17, 0.5), rgba(17, 17, 17, 1))`
@@ -229,7 +255,15 @@ export default function Chat() {
         </Stack>
 
         <Stack flexGrow={1}>
-          <ChatBox />
+          <ChatBox
+            messages={messages}
+            currentChatHistoryId={currentChatHistoryId}
+            chatHistoriesByDates={chatHistoriesByDates}
+            setMessages={setMessages}
+            setChatHistoriesByDates={setChatHistoriesByDates}
+            setCurrentChatHistoryId={setCurrentChatHistoryId}
+            setDates={setDates}
+          />
         </Stack>
       </Stack>
     </>

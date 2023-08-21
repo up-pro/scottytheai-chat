@@ -7,8 +7,9 @@ import { lineaTestnet } from "viem/chains"
 import { w3mConnectors, EthereumClient } from "@web3modal/ethereum"
 import { Web3Modal } from "@web3modal/react"
 import { ToastContainer } from "react-toastify"
-import Loading from "./components/Loading"
+import LoadingForSuspense from "./components/LoadingForSuspense";
 import Routes from "./Routes"
+import { LoadingProvider } from "./contexts/LoadingContext"
 
 //  --------------------------------------------------------------------------------------
 
@@ -49,12 +50,14 @@ const ethereumClient = new EthereumClient(wagmiConfig, chains)
 
 function App() {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<LoadingForSuspense />}>
       <WagmiConfig config={wagmiConfig}>
         <ThemeProvider theme={theme}>
-          <BrowserRouter>
-            <Routes />
-          </BrowserRouter>
+          <LoadingProvider>
+            <BrowserRouter>
+              <Routes />
+            </BrowserRouter>
+          </LoadingProvider>
         </ThemeProvider>
       </WagmiConfig>
       <ToastContainer />

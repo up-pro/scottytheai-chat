@@ -24,3 +24,4 @@ export const SOCIAL_LINKS: Array<ISocialLink> = [
 
 export const CONTRACT_ADDRESS = "0x73ab0d67d74517e0bc9d406d06a744aaa097f96e";
 export const LENGTH_LIMIT_OF_CHAT_HISTORY_TITLE = 30;
+export const MSG_CONNECT_WALLET = "Please connect wallet.";

@@ -92,6 +92,8 @@ export default function Chat() {
   useEffect(() => {
     if (address) {
       getChatHistories()
+    } else {
+      setChatHistories([])
     }
   }, [address])
 

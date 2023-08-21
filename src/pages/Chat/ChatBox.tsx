@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 import api from '../../utils/api';
 import { IChatHistory } from '../../utils/interfaces';
+import { MSG_CONNECT_WALLET } from '../../utils/constants';
 
 //  ---------------------------------------------------------------------------------------------------
 
@@ -39,22 +40,70 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
   //  Send request to ChatGPT
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     try {
-      if (question) {
-        e.preventDefault()
-        setRefetchable(false)
+      e.preventDefault()
+      if (address) {
+        if (question) {
+          setRefetchable(false)
 
-        const _messages = [...messages];
-        _messages.push({
-          role: 'user',
-          content: question
-        })
+          const _messages = [...messages];
+          _messages.push({
+            role: 'user',
+            content: question
+          })
 
-        setMessages(_messages)
-        setQuestion('')
+          setMessages(_messages)
+          setQuestion('')
+          setGptIsLoading(true)
+
+          //  Create chat history if user's wallet is connected and this is the first message
+          if (_messages.length === 1) {
+            const { chatHistories, createdChatHistory } = (await api.post('/create-history', {
+              title: _messages[0].content,
+              creatorWalletAddress: address,
+              messages: _messages
+            })).data
+            setChatHistories(chatHistories)
+            setCurrentChatHistory(createdChatHistory)
+          }
+
+          const chatCompletion = await openai.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: _messages,
+          })
+
+          if (chatCompletion.data.choices[0].message) {
+            _messages.push(chatCompletion.data.choices[0].message)
+            await api.post('/save-messages', {
+              chatHistoryId: currentChatHistory?.id,
+              messages: _messages
+            })
+            const chatHistory = chatHistories.find(_chatHistory => _chatHistory.id === currentChatHistory?.id)
+            if (chatHistory) {
+              chatHistory.messages = JSON.stringify(_messages)
+            }
+            setMessages(_messages)
+          }
+          setGptIsLoading(false)
+        }
+      } else {
+        toast.info(MSG_CONNECT_WALLET)
+      }
+    } catch (error) {
+      console.log('>>>>>>>>>>> error of handleSubmit => ', error)
+      setRefetchable(true)
+      setGptIsLoading(false)
+      toast.error('Chat engine occured error. Try again.')
+    }
+  }
+
+  const refetch = async () => {
+    try {
+      if (address) {
         setGptIsLoading(true)
-
+        setRefetchable(false)
+        const _messages = [...messages]
         //  Create chat history if user's wallet is connected and this is the first message
-        if (_messages.length === 1 && !!(address)) {
+        if (_messages.length === 1) {
           const { chatHistories, createdChatHistory } = (await api.post('/create-history', {
             title: _messages[0].content,
             creatorWalletAddress: address,
@@ -82,49 +131,9 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
           setMessages(_messages)
         }
         setGptIsLoading(false)
+      } else {
+        toast.info(MSG_CONNECT_WALLET)
       }
-    } catch (error) {
-      console.log('>>>>>>>>>>> error of handleSubmit => ', error)
-      setRefetchable(true)
-      setGptIsLoading(false)
-      toast.error('Chat engine occured error. Try again.')
-    }
-  }
-
-  const refetch = async () => {
-    try {
-      setGptIsLoading(true)
-      setRefetchable(false)
-      const _messages = [...messages]
-      //  Create chat history if user's wallet is connected and this is the first message
-      if (_messages.length === 1 && !!(address)) {
-        const { chatHistories, createdChatHistory } = (await api.post('/create-history', {
-          title: _messages[0].content,
-          creatorWalletAddress: address,
-          messages: _messages
-        })).data
-        setChatHistories(chatHistories)
-        setCurrentChatHistory(createdChatHistory)
-      }
-
-      const chatCompletion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: _messages,
-      })
-
-      if (chatCompletion.data.choices[0].message) {
-        _messages.push(chatCompletion.data.choices[0].message)
-        await api.post('/save-messages', {
-          chatHistoryId: currentChatHistory?.id,
-          messages: _messages
-        })
-        const chatHistory = chatHistories.find(_chatHistory => _chatHistory.id === currentChatHistory?.id)
-        if (chatHistory) {
-          chatHistory.messages = JSON.stringify(_messages)
-        }
-        setMessages(_messages)
-      }
-      setGptIsLoading(false)
     } catch (error) {
       console.log('>>>>>>>>>>> error of refetch => ', error)
       setRefetchable(true)

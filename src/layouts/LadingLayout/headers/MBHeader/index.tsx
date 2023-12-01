@@ -3,13 +3,13 @@ import { AppBar, Box, Container, IconButton, Toolbar } from "@mui/material";
 import useMobileMenu from "../../../../hooks/useMobileMenu";
 
 export default function MBHeader() {
-  const { openMenuAct } = useMobileMenu()
+  const { openMenuAct } = useMobileMenu();
 
   return (
     <>
       <AppBar position="static" sx={{ py: 1 }}>
         <Toolbar sx={{ position: "relative" }}>
-          <Container sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Container sx={{ display: "flex", justifyContent: "center" }}>
             <Box
               component="img"
               src="/assets/images/logo.svg"
@@ -18,7 +18,7 @@ export default function MBHeader() {
             />
           </Container>
           <IconButton
-            sx={{ position: 'absolute', right: '3%' }}
+            sx={{ position: "absolute", right: "3%" }}
             onClick={() => openMenuAct()}
           >
             <Menu />
@@ -26,5 +26,5 @@ export default function MBHeader() {
         </Toolbar>
       </AppBar>
     </>
-  )
+  );
 }

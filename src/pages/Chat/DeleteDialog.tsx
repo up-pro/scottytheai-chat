@@ -36,7 +36,6 @@ export default function DeleteDialog({ opened, setOpened, currentChatHistory, se
         closeLoadingAct()
       })
       .catch(error => {
-        console.log('>>>>>>>>>>> error of deleteChatHistory => ', error)
         closeLoadingAct()
       })
   }

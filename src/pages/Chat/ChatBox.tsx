@@ -88,7 +88,6 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
         toast.info(MSG_CONNECT_WALLET)
       }
     } catch (error) {
-      console.log('>>>>>>>>>>> error of handleSubmit => ', error)
       setRefetchable(true)
       setGptIsLoading(false)
       toast.error('Chat engine occured error. Try again.')
@@ -134,7 +133,6 @@ export default function ChatBox({ messages, setMessages, currentChatHistory, set
         toast.info(MSG_CONNECT_WALLET)
       }
     } catch (error) {
-      console.log('>>>>>>>>>>> error of refetch => ', error)
       setRefetchable(true)
       setGptIsLoading(false)
       toast.error('Chat engine occured error. Try again.')

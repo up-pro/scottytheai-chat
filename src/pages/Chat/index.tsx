@@ -285,7 +285,7 @@ export default function Chat() {
                   Chat With Scotty
                 </Button>
 
-                <Stack spacing={1}>
+                {/* <Stack spacing={1}>
                   <Typography component="span" color={grey[100]} fontSize={18}>
                     Contract address
                   </Typography>
@@ -299,7 +299,7 @@ export default function Chat() {
                       {address}
                     </Typography>
                   </Box>
-                </Stack>
+                </Stack> */}
 
                 <Box>
                   <Grid container spacing={2}>
@@ -350,7 +350,7 @@ export default function Chat() {
                         Scotty AI
                       </Button>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    {/* <Grid item xs={12} md={6}>
                       <Button
                         variant="contained"
                         sx={{ bgcolor: grey[900], width: "100%" }}
@@ -366,7 +366,7 @@ export default function Chat() {
                       >
                         Uniswap
                       </Button>
-                    </Grid>
+                    </Grid> */}
                   </Grid>
                 </Box>
               </Stack>

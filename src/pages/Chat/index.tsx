@@ -1,12 +1,18 @@
-import { ChangeEvent, useEffect, useState, useMemo, lazy } from "react";
+import {
+  // ChangeEvent,
+  useEffect,
+  useState,
+  useMemo,
+  lazy,
+} from "react";
 import { Link } from "react-router-dom";
 import {
-  Add,
-  Check,
-  Close,
-  Comment,
-  Delete,
-  Edit,
+  // Add,
+  // Check,
+  // Close,
+  // Comment,
+  // Delete,
+  // Edit,
   Telegram,
   Twitter,
 } from "@mui/icons-material";
@@ -18,8 +24,8 @@ import {
   Typography,
   useTheme,
   Link as MuiLink,
-  IconButton,
-  TextField,
+  // IconButton,
+  // TextField,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { useAccount } from "wagmi";
@@ -87,9 +93,9 @@ export default function Chat() {
   };
 
   //  Handle the title of input
-  const handleTitle = (e: ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
+  // const handleTitle = (e: ChangeEvent<HTMLInputElement>) => {
+  //   setTitle(e.target.value);
+  // };
 
   //  Update title of a chat history
   const updateTitle = () => {
@@ -104,9 +110,9 @@ export default function Chat() {
     });
   };
 
-  const createNewChat = () => {
-    setCurrentChatHistory(null);
-  };
+  // const createNewChat = () => {
+  //   setCurrentChatHistory(null);
+  // };
 
   useEffect(() => {
     if (address) {
@@ -377,7 +383,7 @@ export default function Chat() {
             <Box height="100%">
               <Grid container height="100%" columnSpacing={2}>
                 {/* Chatbox */}
-                <Grid item md={9}>
+                <Grid item md={12}>
                   <ChatBox
                     messages={messages}
                     setMessages={setMessages}
@@ -389,7 +395,7 @@ export default function Chat() {
                 </Grid>
 
                 {/* Right sidebar */}
-                <Grid item md={3}>
+                {/* <Grid item md={3}>
                   <Stack spacing={2} height="100%">
                     <Button
                       variant="contained"
@@ -542,7 +548,7 @@ export default function Chat() {
                         </Stack>
                       ))}
 
-                      {/* <Box
+                      <Box
                         position="absolute"
                         top={0}
                         right={0}
@@ -551,10 +557,10 @@ export default function Chat() {
                         sx={{
                           backgroundImage: `linear-gradient(to right, rgba(17, 17, 17, 0.5), rgba(17, 17, 17, 1))`
                         }}
-                      /> */}
+                      />
                     </Stack>
                   </Stack>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Box>
           </Grid>
